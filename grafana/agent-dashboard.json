@@ -1,0 +1,84 @@
+{
+  "title": "Research Assistant Agent",
+  "schemaVersion": 38,
+  "version": 1,
+  "tags": ["agents", "claude", "openai-agents-sdk"],
+  "time": {"from": "now-1h", "to": "now"},
+  "panels": [
+    {
+      "title": "Requests/sec",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(rate(agent_request_count_total[1m])) by (endpoint)", "legendFormat": "{{endpoint}}"}
+      ]
+    },
+    {
+      "title": "Errors/sec",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(rate(agent_error_count_total[5m])) by (kind)", "legendFormat": "{{kind}}"}
+      ]
+    },
+    {
+      "title": "End-to-end p50 / p95 / p99 latency (ms)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "histogram_quantile(0.5,  sum(rate(agent_latency_ms_bucket[5m])) by (le))", "legendFormat": "p50"},
+        {"expr": "histogram_quantile(0.95, sum(rate(agent_latency_ms_bucket[5m])) by (le))", "legendFormat": "p95"},
+        {"expr": "histogram_quantile(0.99, sum(rate(agent_latency_ms_bucket[5m])) by (le))", "legendFormat": "p99"}
+      ]
+    },
+    {
+      "title": "Model latency p95 (ms)",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "histogram_quantile(0.95, sum(rate(agent_model_latency_ms_bucket[5m])) by (le))", "legendFormat": "p95"}
+      ]
+    },
+    {
+      "title": "Tool latency p95 (ms) by tool",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "histogram_quantile(0.95, sum(rate(agent_tool_latency_ms_bucket[5m])) by (le, tool))", "legendFormat": "{{tool}}"}
+      ]
+    },
+    {
+      "title": "Tokens (in / out) per minute",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(rate(agent_tokens_in_total[1m]))",  "legendFormat": "in"},
+        {"expr": "sum(rate(agent_tokens_out_total[1m]))", "legendFormat": "out"}
+      ]
+    },
+    {
+      "title": "Estimated cost USD / 5min",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(increase(agent_estimated_cost_usd_total[5m])) by (model)", "legendFormat": "{{model}}"}
+      ]
+    },
+    {
+      "title": "Tool calls / min",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(rate(agent_tool_call_count_total[1m])) by (tool)", "legendFormat": "{{tool}}"}
+      ]
+    },
+    {
+      "title": "Fallback activations / 5min",
+      "type": "timeseries",
+      "datasource": "Prometheus",
+      "targets": [
+        {"expr": "sum(increase(agent_fallback_count_total[5m])) by (kind)", "legendFormat": "{{kind}}"}
+      ]
+    }
+  ]
+}
